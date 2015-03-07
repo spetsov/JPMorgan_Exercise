@@ -118,3 +118,17 @@ $RECYCLE.BIN/\
 # Windows shortcuts\
 *.lnk}
 .classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
+bin/common/Gateway.class
+bin/common/Message.class
+bin/common/MessageImpl.class
+bin/common/Observable.class
+bin/common/Observer.class
+bin/demos/Demo.class
+bin/ext/GatewayImpl.class
+bin/scheduling/GroupTerminatedException.class
+bin/scheduling/MessagePrioritisationQueue.class
+bin/scheduling/PriorityGroupQueue.class
+bin/scheduling/PriorityNaturalOrderQueue.class
+bin/scheduling/ResourceScheduler.class
