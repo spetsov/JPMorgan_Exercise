@@ -18,7 +18,7 @@ public class Demo {
 		Message m6 = new MessageImpl(3, testText, 6);
 		Message m7 = new MessageImpl(2, testText, 7);
 		//m3.setTerminationMessage();
-		ResourceScheduler sch = new ResourceScheduler(2, new GatewayImpl(), new GroupNaturalOrderPrioritisationSequence());
+		ResourceScheduler sch = new ResourceScheduler(2, new GatewayImpl(), new GroupSequencePrioritisationStrategy());
 		Thread t = new Thread(sch);
 		t.start();
 		sch.scheduleSend(m1);
@@ -30,7 +30,7 @@ public class Demo {
 		sch.scheduleSend(m7);
 		//sch.cancelGroup(2);
 		try {
-			Thread.sleep(100);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

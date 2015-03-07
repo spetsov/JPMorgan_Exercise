@@ -32,16 +32,16 @@ public class ResourceScheduler implements Runnable, Observer {
 	public void run() {
 		while (true) {
 			int res = this.availableResources.get();
-			if (res > 0 && !queue.isEmpty()) {
-				Message m = queue.dequeue();
-				sendMessage(m);
-			} else {
+			if (res > 0) {
+				Message m;
 				try {
-					Thread.sleep(1000);
+					m = queue.take();
+					sendMessage(m);
 				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-			}
+				}				
+			} 
 		}
 	}
 
@@ -63,11 +63,7 @@ public class ResourceScheduler implements Runnable, Observer {
 			return;
 		}
 		m.addObserver(this);
-		int res = this.availableResources.get();
-		if(res > 0 && queue.isEmpty())
-			sendMessage(m);
-		else
-			this.queue.enqueue(m);
+		this.queue.put(m);
 	}
 	
 	public void cancelGroup(int groupId){
