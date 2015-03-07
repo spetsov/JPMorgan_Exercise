@@ -1,6 +1,9 @@
-package common;
+package scheduling;
 
 import java.util.Vector;
+
+import common.Message;
+import common.Observer;
 
 public class MessageImpl implements Message {
 
@@ -48,7 +51,6 @@ public class MessageImpl implements Message {
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Message finished processing - id: " + this.messageId);

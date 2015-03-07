@@ -1,11 +1,7 @@
 package scheduling;
 
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import common.Gateway;
@@ -38,7 +34,6 @@ public class ResourceScheduler implements Runnable, Observer {
 					m = queue.take();
 					sendMessage(m);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}				
 			} 
