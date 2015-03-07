@@ -1,5 +1,7 @@
 package scheduling;
 
-public class GroupTerminatedException extends Exception {
+import java.util.List;
 
+public class GroupTerminatedException extends Exception {
+	
 }

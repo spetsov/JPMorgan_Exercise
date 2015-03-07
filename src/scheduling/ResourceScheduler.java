@@ -16,12 +16,12 @@ import common.Observer;
 public class ResourceScheduler implements Runnable, Observer {
 	private Set<Integer> cancelledGroups;
 	private Set<Integer> terminatedGroups;
-	private MessagePrioritisationQueue queue;
+	private PriorityGroupQueue queue;
 	private Gateway gate;
 	private AtomicInteger availableResources;
 
-	public ResourceScheduler(int availableResources, Gateway gate, MessagePrioritisationQueue queue) {
-		this.queue = queue;
+	public ResourceScheduler(int availableResources, Gateway gate, PrioritisationStrategy pStrategy) {
+		this.queue = new PriorityGroupQueue(pStrategy);
 		this.cancelledGroups = new HashSet<Integer>();
 		this.terminatedGroups = new HashSet<Integer>();
 		this.availableResources = new AtomicInteger(availableResources);

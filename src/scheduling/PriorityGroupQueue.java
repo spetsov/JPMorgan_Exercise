@@ -9,43 +9,36 @@ import java.util.HashMap;
 
 import common.*;
 
-public class PriorityGroupQueue implements MessagePrioritisationQueue {
-	private Map<Integer, Queue<Message>> qSet;
-	private List<Integer> groupsOrderList;
+public class PriorityGroupQueue {
+	private Map<Integer, Queue<Message>> qMap;
+	private PrioritisationStrategy pStrategy;
 	
-	public PriorityGroupQueue(){
-		this.qSet = new HashMap<Integer, Queue<Message>>();
-		this.groupsOrderList = new ArrayList<Integer>();
+	public PriorityGroupQueue(PrioritisationStrategy pStrategy){
+		this.qMap = new HashMap<Integer, Queue<Message>>();
+		this.pStrategy = pStrategy;
 	}
 	
 	public void enqueue(Message m){
+		pStrategy.setPriority(m, qMap);
 		int groupId = m.getGroupId();
-		if(qSet.containsKey(groupId)){
-			Queue<Message> queue = qSet.get(groupId);
+		if(qMap.containsKey(groupId)){
+			Queue<Message> queue = qMap.get(groupId);
 			queue.add(m);
 		}
 		else{
 			Queue<Message> queue = new LinkedList<Message>();
 			queue.add(m);
-			qSet.put(groupId, queue);
-			groupsOrderList.add(groupId);
+			qMap.put(groupId, queue);
 		}
 	}
 	
 	public Message dequeue(){
-		for (int i = 0; i < groupsOrderList.size(); i++) {
-			int groupId = groupsOrderList.get(i);
-			Queue<Message> queue = qSet.get(groupId);
-			if(!queue.isEmpty()){
-				return queue.remove();
-			}
-		}
-		return null;
+		return pStrategy.getNext(qMap);
 	}
 	
 	public boolean isEmpty(){
-		for (Integer groupId : qSet.keySet()) {
-			Queue<Message> queue = qSet.get(groupId);
+		for (Integer groupId : qMap.keySet()) {
+			Queue<Message> queue = qMap.get(groupId);
 			if(!queue.isEmpty())
 				return false;
 		}

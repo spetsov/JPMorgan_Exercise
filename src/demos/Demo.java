@@ -18,7 +18,7 @@ public class Demo {
 		Message m6 = new MessageImpl(3, testText, 6);
 		Message m7 = new MessageImpl(2, testText, 7);
 		//m3.setTerminationMessage();
-		ResourceScheduler sch = new ResourceScheduler(2, new GatewayImpl(), new PriorityGroupQueue());
+		ResourceScheduler sch = new ResourceScheduler(2, new GatewayImpl(), new GroupNaturalOrderPrioritisationSequence());
 		Thread t = new Thread(sch);
 		t.start();
 		sch.scheduleSend(m1);
