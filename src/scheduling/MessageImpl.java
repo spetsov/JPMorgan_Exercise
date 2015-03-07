@@ -1,51 +1,13 @@
 package scheduling;
 
-import java.util.Vector;
+import common.AbstractMessage;
 
-import common.Message;
-import common.Observer;
-
-public class MessageImpl implements Message {
-
-	private int groupId;
-	private int messageId;
-	private boolean isTerminationMessage;
-	private String text;
-	private Vector<Observer> observers;
+public class MessageImpl extends AbstractMessage {
 	
-	public MessageImpl(int groupId, String text, int messageId){
-		this.groupId = groupId;
-		this.text = text;
-		this.messageId = messageId;
-		this.observers = new Vector<Observer>();
-		this.isTerminationMessage = false;
-	}
-	
-	@Override
-	public void completed() {
-		this.notifyObservers();
+	public MessageImpl(int groupId, String text, int messageId) {
+		super(groupId, text, messageId);
 	}
 
-	@Override
-	public int getGroupId() {
-		return this.groupId;
-	}
-	
-	@Override
-	public int getId(){
-		return this.messageId;
-	}
-	
-	@Override
-	public boolean isTerminationMessage() {
-		return this.isTerminationMessage;
-	}
-	
-	@Override
-	public void setTerminationMessage(){
-		this.isTerminationMessage = true;
-	}
-	
 	@Override
 	public void run() {
 		try {
@@ -53,32 +15,8 @@ public class MessageImpl implements Message {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Message finished processing - id: " + this.messageId);
+		System.out.println("Message finished processing - id: " + this.getId());
 		this.completed();
-	}
-
-	@Override
-	public void addObserver(Observer o) {
-		if (!observers.contains(o)) {
-			observers.addElement(o);
-        }
-	}
-
-	@Override
-	public void notifyObservers() {
-		Object[] arrLocal;
-
-        synchronized (this) {
-            arrLocal = observers.toArray();
-        }
-
-        for (int i = arrLocal.length-1; i>=0; i--)
-            ((Observer)arrLocal[i]).update(this, null);
-	}
-
-	@Override
-	public void deleteObserver(Observer o) {
-		this.observers.remove(o);
 	}
 
 }

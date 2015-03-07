@@ -15,6 +15,7 @@ public class ResourceScheduler implements Runnable, Observer {
 	private PriorityGroupQueue queue;
 	private Gateway gate;
 	private AtomicInteger availableResources;
+	private Thread t;
 
 	public ResourceScheduler(int availableResources, Gateway gate, PrioritisationStrategy pStrategy) {
 		this.queue = new PriorityGroupQueue(pStrategy);
@@ -22,11 +23,12 @@ public class ResourceScheduler implements Runnable, Observer {
 		this.terminatedGroups = new HashSet<Integer>();
 		this.availableResources = new AtomicInteger(availableResources);
 		this.gate = gate;
+		this.t = new Thread(this);
 	}
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!(Thread.currentThread().isInterrupted())) {
 			int res = this.availableResources.get();
 			if (res > 0) {
 				Message m;
@@ -34,7 +36,7 @@ public class ResourceScheduler implements Runnable, Observer {
 					m = queue.take();
 					sendMessage(m);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					Thread.currentThread().interrupt();
 				}				
 			} 
 		}
@@ -45,6 +47,14 @@ public class ResourceScheduler implements Runnable, Observer {
 		this.availableResources.incrementAndGet();
 		// prevent memory leak
 		o.deleteObserver(this);
+	}
+	
+	public void startListening(){
+		t.start();
+	}
+	
+	public void stopListening(){
+		t.interrupt();
 	}
 
 	public void scheduleSend(Message m) throws GroupTerminatedException {

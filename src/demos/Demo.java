@@ -7,15 +7,16 @@ import ext.GatewayImpl;
 
 public class Demo {
 
-	public static void main(String[] args) throws GroupTerminatedException {
+	public static void main(String[] args) throws GroupTerminatedException, InterruptedException {
 		
 		ResourceScheduler sch = new ResourceScheduler(5, new GatewayImpl(), new GroupSequencePrioritisationStrategy());
 		Sender sender = new Sender(sch);
-		Thread t1 = new Thread(sch);
+		sch.startListening();
 		Thread t2 = new Thread(sender);
-		t1.start();
 		t2.start();
-		
+		Thread.sleep(10000);
+		sch.stopListening();
+		t2.interrupt();
 	}
 
 }
