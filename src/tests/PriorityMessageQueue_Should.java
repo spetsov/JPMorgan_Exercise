@@ -63,4 +63,29 @@ public class PriorityMessageQueue_Should {
 		assertEquals(queue.take(), m4);
 		assertEquals(queue.take(), m3);
 	}
+	
+
+	@Test
+	public void DISCARD_GROUP() throws InterruptedException{
+		List<Integer> priorities = new ArrayList<Integer>();
+		priorities.add(3);
+		priorities.add(1);
+		priorities.add(2);
+		PrioritisationStrategyMock str = new PrioritisationStrategyMock(priorities);
+		PriorityMessageQueue queue = new PriorityMessageQueue(str);
+		String text = "Test";
+		MessageMock m1 = new MessageMock(1, text, 1);
+		MessageMock m2 = new MessageMock(3, text, 2);
+		MessageMock m3 = new MessageMock(2, text, 3);
+		MessageMock m4 = new MessageMock(1, text, 4);
+		queue.put(m1);
+		queue.put(m2);
+		queue.put(m3);
+		queue.put(m4);
+		
+		queue.discardQueue(1);
+		
+		assertEquals(queue.take(), m2);
+		assertEquals(queue.take(), m3);
+	}
 }

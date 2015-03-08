@@ -31,8 +31,7 @@ public class PrioritisationStrategyMock implements PrioritisationStrategy {
 
 	@Override
 	public void removePriority(int groupID) {
-		// TODO Auto-generated method stub
-		
+		this.priorities.remove((Integer)groupID);
 	}
 
 }

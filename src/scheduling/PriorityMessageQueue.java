@@ -47,7 +47,7 @@ public class PriorityMessageQueue {
 		return result;
 	}
 
-	void discardQueue(int id) {
+	public void discardQueue(int id) {
 		final ReentrantLock lock = this.lock;
 		lock.lock();
 		try {
