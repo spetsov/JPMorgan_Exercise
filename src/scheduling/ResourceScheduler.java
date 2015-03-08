@@ -12,13 +12,13 @@ import common.Observer;
 public class ResourceScheduler implements Runnable, Observer {
 	private Set<Integer> cancelledGroups;
 	private Set<Integer> terminatedGroups;
-	private PriorityGroupQueue queue;
+	private PriorityMessageQueue queue;
 	private Gateway gate;
 	private AtomicInteger availableResources;
 	private Thread t;
 
 	public ResourceScheduler(int availableResources, Gateway gate, PrioritisationStrategy pStrategy) {
-		this.queue = new PriorityGroupQueue(pStrategy);
+		this.queue = new PriorityMessageQueue(pStrategy);
 		this.cancelledGroups = new HashSet<Integer>();
 		this.terminatedGroups = new HashSet<Integer>();
 		this.availableResources = new AtomicInteger(availableResources);
@@ -73,6 +73,7 @@ public class ResourceScheduler implements Runnable, Observer {
 	
 	public void cancelGroup(int groupId){
 		if(!cancelledGroups.contains(groupId)){
+			this.queue.discardQueue(groupId);
 			cancelledGroups.add(groupId);
 		}
 	}
@@ -83,6 +84,7 @@ public class ResourceScheduler implements Runnable, Observer {
 	
 	private void terminateGroup(int groupId){
 		if(!terminatedGroups.contains(groupId)){
+			this.queue.discardQueue(groupId);
 			terminatedGroups.add(groupId);
 		}
 	}

@@ -7,12 +7,12 @@ import java.util.Map;
 import org.junit.Test;
 
 import common.Message;
-import scheduling.GroupNaturalOrderPrioritisationSequence;
+import scheduling.GroupNaturalOrderPrioritisationStrategy;
 import scheduling.GroupSequencePrioritisationStrategy;
 import scheduling.GroupTerminatedException;
 import scheduling.ResourceScheduler;
 
-public class SchedulerShould {
+public class Scheduler_Should {
 
 	@Test
 	public void SEND_MESSAGES_IN_CORRECT_SEQUENCE() {
@@ -63,7 +63,7 @@ public class SchedulerShould {
 	public void SEND_MESSAGES_IN_NATURAL_SEQUENCE() {
 		String testText = "test";
 		GatewayMock mock = new GatewayMock(7);
-		ResourceScheduler sch = new ResourceScheduler(5, mock, new GroupNaturalOrderPrioritisationSequence());
+		ResourceScheduler sch = new ResourceScheduler(5, mock, new GroupNaturalOrderPrioritisationStrategy());
 		Message m1 = new MessageMock(2, testText, 1);
 		Message m2 = new MessageMock(1, testText, 2);
 		Message m3 = new MessageMock(2, testText, 3);

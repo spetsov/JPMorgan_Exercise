@@ -1,5 +1,6 @@
 package scheduling;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -9,20 +10,20 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import common.*;
 
-class PriorityGroupQueue {
+public class PriorityMessageQueue {
 	private Map<Integer, Queue<Message>> qMap;
 	private PrioritisationStrategy pStrategy;
 	Condition isEmptyCondition;
 	ReentrantLock lock;
 
-	PriorityGroupQueue(PrioritisationStrategy pStrategy) {
+	public PriorityMessageQueue(PrioritisationStrategy pStrategy) {
 		this.qMap = new HashMap<Integer, Queue<Message>>();
 		this.pStrategy = pStrategy;
 		lock = new ReentrantLock();
 		isEmptyCondition = lock.newCondition();
 	}
 
-	void put(Message m) {
+	public void put(Message m) {
 		final ReentrantLock lock = this.lock;
 		lock.lock();
 		try {
@@ -33,7 +34,7 @@ class PriorityGroupQueue {
 		}
 	}
 
-	Message take() throws InterruptedException {
+	public Message take() throws InterruptedException {
 		final ReentrantLock lock = this.lock;
 		lock.lockInterruptibly();
 		Message result;
@@ -46,8 +47,18 @@ class PriorityGroupQueue {
 		return result;
 	}
 
+	void discardQueue(int id) {
+		final ReentrantLock lock = this.lock;
+		lock.lock();
+		try {
+			this.qMap.remove(id);
+			this.pStrategy.removePriority(id);
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	private void enqueue(Message m) {
-		pStrategy.setPriority(m, qMap);
 		int groupId = m.getGroupId();
 		if (qMap.containsKey(groupId)) {
 			Queue<Message> queue = qMap.get(groupId);
@@ -56,10 +67,20 @@ class PriorityGroupQueue {
 			Queue<Message> queue = new LinkedList<Message>();
 			queue.add(m);
 			qMap.put(groupId, queue);
+			pStrategy.setPriority(groupId);
 		}
 	}
 
 	private Message dequeue() {
-		return pStrategy.getNext(qMap);
+		Iterator<Integer> it = pStrategy.getIterator();
+		while (it.hasNext()) {
+			int groupId = it.next();
+			Queue<Message> queue = qMap.get(groupId);
+			if (!queue.isEmpty()) {
+				return queue.remove();
+			}
+		}
+
+		return null;
 	}
 }

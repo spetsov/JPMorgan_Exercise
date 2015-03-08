@@ -1,11 +1,9 @@
 package scheduling;
 
-import java.util.Map;
-import java.util.Queue;
-
-import common.Message;
+import java.util.Iterator;
 
 public interface PrioritisationStrategy {
-	void setPriority(Message m, Map<Integer, Queue<Message>> qMap);
-	Message getNext(Map<Integer, Queue<Message>> qMap);
+	void setPriority(int groupID);
+	Iterator<Integer> getIterator();
+	void removePriority(int groupID);
 }
