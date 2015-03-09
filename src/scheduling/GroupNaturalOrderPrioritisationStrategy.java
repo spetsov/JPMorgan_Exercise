@@ -1,11 +1,10 @@
 package scheduling;
 
 import java.util.Iterator;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class GroupNaturalOrderPrioritisationStrategy implements PrioritisationStrategy {
-	private SortedSet<Integer> priorities;
+	private TreeSet<Integer> priorities;
 	
 	public GroupNaturalOrderPrioritisationStrategy() {
 		this.priorities = new TreeSet<Integer>();

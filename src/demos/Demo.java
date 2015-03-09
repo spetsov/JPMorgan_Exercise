@@ -9,7 +9,7 @@ public class Demo {
 
 	public static void main(String[] args) throws GroupTerminatedException, InterruptedException {
 		
-		ResourceScheduler sch = new ResourceScheduler(5, new GatewayImpl(), new GroupSequencePrioritisationStrategy());
+		ResourceScheduler sch = new ResourceScheduler(2, new GatewayImpl(), new GroupSequencePrioritisationStrategy());
 		Sender sender = new Sender(sch);
 		sch.startListening();
 		Thread t2 = new Thread(sender);

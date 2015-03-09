@@ -1,5 +1,7 @@
 package demos;
 
+import java.util.Random;
+
 import scheduling.GroupTerminatedException;
 import scheduling.MessageImpl;
 import scheduling.ResourceScheduler;
@@ -15,15 +17,21 @@ public class Sender implements Runnable {
 	@Override
 	public void run() {
 		String testText = "test";
-		Message m1 = new MessageImpl(2, testText, 1);
-		Message m2 = new MessageImpl(1, testText, 2);
-		Message m3 = new MessageImpl(2, testText, 3);
-		Message m4 = new MessageImpl(3, testText, 4);
-		Message m5 = new MessageImpl(1, testText, 5);
-		Message m6 = new MessageImpl(3, testText, 6);
-		Message m7 = new MessageImpl(2, testText, 7);
-		// m3.setTerminationMessage();
+		Random rand = new Random();
 		try {
+//			for (int i = 0; i < 100; i++) {
+//				int groupId = rand.nextInt(10);
+//				sch.scheduleSend(new MessageImpl(groupId, testText, i));
+//			}
+			Message m1 = new MessageImpl(2, testText, 1);
+			Message m2 = new MessageImpl(1, testText, 2);
+			Message m3 = new MessageImpl(2, testText, 3);
+			Message m4 = new MessageImpl(3, testText, 4);
+			Message m5 = new MessageImpl(1, testText, 5);
+			Message m6 = new MessageImpl(3, testText, 6);
+			Message m7 = new MessageImpl(2, testText, 7);
+			// m3.setTerminationMessage();
+
 			sch.scheduleSend(m1);
 
 			sch.scheduleSend(m2);

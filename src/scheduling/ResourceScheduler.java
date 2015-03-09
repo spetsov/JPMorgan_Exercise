@@ -2,6 +2,7 @@ package scheduling;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import common.Gateway;
@@ -14,90 +15,93 @@ public class ResourceScheduler implements Runnable, Observer {
 	private Set<Integer> terminatedGroups;
 	private PriorityMessageQueue queue;
 	private Gateway gate;
-	private AtomicInteger availableResources;
-	private Thread t;
+	private Semaphore availableResources;
+	private Thread consumerThread;
 
-	public ResourceScheduler(int availableResources, Gateway gate, PrioritisationStrategy pStrategy) {
+	public ResourceScheduler(int availableResources, Gateway gate,
+			PrioritisationStrategy pStrategy) {
 		this.queue = new PriorityMessageQueue(pStrategy);
 		this.cancelledGroups = new HashSet<Integer>();
 		this.terminatedGroups = new HashSet<Integer>();
-		this.availableResources = new AtomicInteger(availableResources);
+		this.availableResources = new Semaphore(availableResources, true);
 		this.gate = gate;
-		this.t = new Thread(this);
+		this.consumerThread = new Thread(this);
 	}
 
 	@Override
 	public void run() {
 		while (!(Thread.currentThread().isInterrupted())) {
-			int res = this.availableResources.get();
-			if (res > 0) {
-				Message m;
-				try {
-					m = queue.take();
-					sendMessage(m);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}				
-			} 
+
+			Message m;
+			try {
+				this.availableResources.acquire();
+				m = queue.take();
+				if(!sendMessage(m))
+					this.availableResources.release();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		this.availableResources.incrementAndGet();
+		this.availableResources.release();
 		// prevent memory leak
 		o.deleteObserver(this);
 	}
-	
-	public void startListening(){
-		t.start();
+
+	public void startListening() {
+		consumerThread.start();
 	}
-	
-	public void stopListening(){
-		t.interrupt();
+
+	public void stopListening() {
+		consumerThread.interrupt();
 	}
 
 	public void scheduleSend(Message m) throws GroupTerminatedException {
-		if(this.isTerminated(m)){
+		if (this.isTerminated(m)) {
 			throw new GroupTerminatedException();
 		}
-		if(m.isTerminationMessage()){
+		if (m.isTerminationMessage()) {
 			this.terminateGroup(m.getGroupId());
 		}
-		if(this.isCancelled(m)){
+		if (this.isCancelled(m)) {
 			return;
 		}
 		m.addObserver(this);
+
 		this.queue.put(m);
+
 	}
-	
-	public void cancelGroup(int groupId){
-		if(!cancelledGroups.contains(groupId)){
+
+	public void cancelGroup(int groupId) {
+		if (!cancelledGroups.contains(groupId)) {
 			this.queue.discardQueue(groupId);
 			cancelledGroups.add(groupId);
 		}
 	}
-	
-	public boolean isCancelled(Message m){
+
+	public boolean isCancelled(Message m) {
 		return cancelledGroups.contains(m.getGroupId());
 	}
-	
-	private void terminateGroup(int groupId){
-		if(!terminatedGroups.contains(groupId)){
+
+	private void terminateGroup(int groupId) {
+		if (!terminatedGroups.contains(groupId)) {
 			this.queue.discardQueue(groupId);
 			terminatedGroups.add(groupId);
 		}
 	}
-	
-	private boolean isTerminated(Message m){
+
+	private boolean isTerminated(Message m) {
 		return terminatedGroups.contains(m.getGroupId());
 	}
 
-	private void sendMessage(Message m) {
+	private boolean sendMessage(Message m) throws InterruptedException {
 		if (m != null && !this.isCancelled(m)) {
-			if (this.gate.send(m))
-				this.availableResources.decrementAndGet();
+			return this.gate.send(m);
 		}
+		return false;
 	}
 
 }

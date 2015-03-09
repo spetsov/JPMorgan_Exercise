@@ -46,6 +46,21 @@ public class PriorityMessageQueue {
 		}
 		return result;
 	}
+	
+	public boolean isEmpty(){
+		final ReentrantLock lock = this.lock;
+		lock.lock();
+		try {
+			for (Integer key : qMap.keySet()) {
+				Queue<Message> current = qMap.get(key);
+				if(!current.isEmpty())
+					return false;
+			}
+			return true;
+		} finally {
+			lock.unlock();
+		}
+	}
 
 	public void discardQueue(int id) {
 		final ReentrantLock lock = this.lock;
